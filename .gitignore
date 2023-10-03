@@ -1,1 +1,2 @@
-/data
+/data*
+/tests/docalign/out.txt

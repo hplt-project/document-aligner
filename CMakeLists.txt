@@ -10,6 +10,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 set(CMAKE_CXX_FLAGS_DEBUG "-Wextra -g")
 
+# Lazy mode: get me a static binary for at least the essentials
+set(Boost_USE_STATIC_LIBS ON)
+set(ZLIB_USE_STATIC_LIBS ON)
+
 # Compile all executables into bin/
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 
@@ -48,7 +52,6 @@ include_directories(${PREPROCESS_PATH})
 # find *.h and *.cpp files
 file(GLOB dalign_cpp_headers ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 file(GLOB dalign_cpp_cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-file(GLOB dalign_tests ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
 
 # Tool to score alignment between two sets of documents in the same language.
 add_executable(docalign docalign.cpp ${dalign_cpp_headers} ${dalign_cpp_cpp})
@@ -65,10 +68,8 @@ install(TARGETS docjoin docalign
     LIBRARY DESTINATION ${CMAKE_LIBRARY_BINDIR}
 )
 
-if (BUILD_TESTING)
-  add_executable(ngram_test tests/ngram_test.cpp ${dalign_cpp_headers} ${dalign_cpp_cpp})
-  target_compile_definitions(ngram_test PRIVATE "BOOST_TEST_DYN_LINK=1")
-  target_link_libraries(ngram_test ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} preprocess_util)
-  add_test(NAME ngram_test COMMAND ngram_test)
-endif (BUILD_TESTING)
+option(COMPILE_TESTS "Compile tests" OFF)
+if (COMPILE_TESTS)
+  add_subdirectory(tests) 
+endif (COMPILE_TESTS)
 
